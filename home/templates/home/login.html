@@ -1,0 +1,65 @@
+{% extends 'home/index.html' %}
+
+{% block body %}
+<div class="container">
+    <div class="section">
+    {% comment %} We can opt for toast here {% endcomment %}
+        {% if messages %}
+            <ul class="messages alert">
+                {% for message in messages %}
+                    <div class="alert {{ message.tags }} alert-dismissible" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <div class="row center-align">
+            <form class="col s8 offset-s4" method="POST" action={% url 'login' %}>
+                {% csrf_token %}
+                <div class="row">
+                <div class="input-field col s6">
+                  <i class="material-icons prefix">phone</i>
+                  <input id="icon_telephone" name="mobile" type="tel" class="validate" placeholder="+910000000000"
+                    {% if mobile %}
+                        value="{{mobile}}"
+                    {% endif %}
+                    {% if view_code %}
+                        readonly
+                    {% endif %}
+                  >
+                  <label for="icon_telephone">Telephone</label>
+                </div>
+                </div>
+
+                {% if view_code %}
+                <div class="row">
+                <div class="input-field col s6">
+                  <i class="material-icons prefix">lock</i>
+                  <input id="icon_auth_code" name="auth_code" type="text" class="validate" placeholder="Enter 5 digit authentication code">
+                  <label for="icon_auth_code">Authentication Code</label>
+                </div>
+                </div>
+                {% endif %}
+                
+                <div class="row">
+                    <div class="input-field col s6">
+                       <input type="submit" name="submit" class="waves-effect waves-light btn"
+                            {% if view_code %}
+                                value="Verify Authentication Code"
+                            {% else %}
+                                value="Send Authentication Code"
+                            {% endif %}
+                            
+                        >
+                    </div>
+                </div>
+            </form>
+          </div>
+
+    </div>
+  </div>
+{% endblock body %}

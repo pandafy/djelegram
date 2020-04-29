@@ -1,0 +1,26 @@
+version: "3"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+    - 8000:8000
+    volumes:
+    - ./:/app
+    command: sh -c "python manage.py runserver 0.0.0.0:8000"
+    depends_on:
+      - redis
+
+  redis:
+    restart: always
+    image: redis:6.0-rc4-alpine
+
+  celery:
+    build: .
+    command: celery -A djelegram worker -l info
+    volumes:
+      - .:/app
+    depends_on:
+      - redis

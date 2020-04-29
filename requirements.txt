@@ -1,0 +1,7 @@
+telethon
+cryptg
+pillow
+aiohttp
+hachoir
+Django
+celery[redis]
