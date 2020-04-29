@@ -12,10 +12,14 @@ services:
     command: sh -c "python manage.py runserver 0.0.0.0:8000"
     depends_on:
       - redis
+    links:
+      - redis:redis
 
   redis:
     restart: always
     image: redis:6.0-rc4-alpine
+    ports:
+      - 6379:6379
 
   celery:
     build: .
@@ -24,3 +28,4 @@ services:
       - .:/app
     depends_on:
       - redis
+  

@@ -130,5 +130,14 @@ except:
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
-CELERY_BROKER_URL = 'redis://redis:6739/'
-CELERY_RESULT_BACKEND = 'redis://redis:6739/'
+CELERY_BROKER_URL = 'redis://redis:6379/'
+CELERY_RESULT_BACKEND = 'redis://redis:6379/'
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://redis:6379/0",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
