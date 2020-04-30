@@ -21,6 +21,13 @@ async def sign_in(mobile, code, phone_code_hash):
         return str(e)
 
 
+async def get_dialogs():
+    client = TelegramClient('session_namea', settings.API_ID, settings.API_HASH)
+    # await client.connect()
+    dialogs = await client.get_dialogs()
+    
+
+
 def waiting_for_response(response):
     while not response.ready():
         time.sleep(1)

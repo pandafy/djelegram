@@ -12,3 +12,7 @@ def send_code_request(mobile):
 @shared_task
 def verify_auth_code(mobile, code, phone_code_hash):
     return asyncio.run(utils.sign_in(mobile, code, phone_code_hash))
+
+@shared_task
+def get_all_chats():
+    return asyncio.run(utils.get_dialogs())
