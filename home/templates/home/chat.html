@@ -32,9 +32,10 @@
 ul li{
   display:inline-block;
   clear: both;
-  padding: 10px;
+  padding: 15px;
   border-radius: 30px;
   margin-bottom: 2px;
+  max-width:80%;
   /* font-family: Helvetica, Arial, sans-serif; */
 }
 
@@ -60,7 +61,36 @@ ul li{
 
     .me:last-of-type {
     border-bottom-
-    right-radius: 30px;
+    right-radius: 30px;.da
+    }
+
+    .chat{
+        height:fixed;
+        overflow-y: scroll;
+        display: flex;
+        flex-direction: column-reverse;
+    }
+
+    .channel-meta{
+        color : #698192;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;   
+        width: 75%;
+        display: inline-block;
+    }
+    .chat-title{
+        white-space: nowrap;
+        width: 70%;
+        overflow: hidden;
+        display:inline-block;
+        text-overflow: ellipsis;   
+    }
+    .chat-time{
+        
+    }
+    .badge{
+        min-width : 1rem !important;
     }
     
 
@@ -71,36 +101,98 @@ ul li{
 {% block body %}
 <div class="container">
     <div class="row chat-container">
-        <div class="col s4" style="overflow-y:scroll">
-            <div class="card-panel teal" > 
-                <span class="white-text">Contact Name</span>
-              </div>
-              <div class="card-panel">
-                                <span class="">Contact Name</span>
+        <div class="col s4" style="overflow-y:scroll; height:80vh">
+            
+            {% if channels %}
+            {% if selected_chat %}  
+                <a href="{%url 'chat' selected_chat.id %}">
+                    <div class="card-panel teal " > 
+                        <span class="chat-title white-text">{{selected_chat.name}}</span>
+                        <span class="right chat-time white-text">{{ selected_chat.date }}</span>
+                    <div class="white-text">
+                        <span class="channel-meta white-text">
+                        {% if selected_chat.message %}
+                            {% if request.session.user_id|slugify == selected_chat.sender %}
+                                You
+                            {% else %}
+                                {{ entities|get_item:selected_chat.sender }}
+                            {% endif %}
+                            
+                            : {{selected_chat.message}}
+                        {% endif %}
+                        </span>
+                         {% if selected_chat.unread_count %}
+                        <span class="white badge circle teal-text right"  data-badge-caption="">{{selected_chat.unread_count}}</span>
+                        {% endif %} 
+                    </div>
+                    </div>
+                </a>
+            {% endif %}
 
-              </div>
-              <div class="card-panel">
-                                <span class="">Contact Name</span>
+            {% for channel in channels %}
+                {% if channel.id == selected_chat.id %}
 
-              </div>
+                {% else %}
+                <a href="{%url 'chat' channel.id %}">
+                    <div class="card-panel"> 
+                    <div>
+                        <span class="chat-title">{{channel.name}}</span>
+                        <span class="right chat-time">{{channel.date}}</span>
+                    </div>
+                    <div class="">
+                        <span class="channel-meta">
+                        {% if channel.message %}
+                            {% if request.session.user_id|slugify == channel.sender %}
+                                You
+                            {% else %}
+                                {{ entities|get_item:channel.sender }}
+                            {% endif %}
+                            
+                            : {{channel.message}}
+                        {% endif %}
+                        </span>
+                        {% if channel.unread_count %}
+                        <span class="teal badge circle white-text right"  data-badge-caption="">{{channel.unread_count}}</span>
+                        {% endif %}
+                    </div>
+                    </div>
+                </a>
+                {% endif %}
+            {% endfor %}
+            {% endif %}
         </div>
         <div class="col s8">
             <div class="chat card-panel">
                 <ul>
-                    <li class="them">By Other User</li>
-                    <li class="me">By this User, first message</li>
-                    <li class="me">By this User, secondmessage</li>
-                    <li class="me">By this User, third message</li>
-                    <li class="me">By this User, fourth message</li>
+                
+                    {% if messages %}
+                    
+                        {% for message in messages reversed%}
+                            <li 
+                                {% if request.session.user_id == message.from_id  %}
+                                    class="me"
+                                {% else %}
+                                    class="them"
+                                {% endif %}
+                                >{{message.text}}{{ message.from_user }}</li>
+                        {% endfor %}
+                    {% endif %}
+
                    </ul>
             </div>
             <div class="row">
+                <form method="POST" action={% url 'send-message' %}>
+                {% csrf_token %}
+                <input type="hidden" value="{{request.session.recipient}}" name="recipient" type="number">
                 <div class=" col s11 message-bar">
-                    <input type="text" name="text-message" placeholder="Type your message here." id="">
+                
+                    <input type="text" name="text" placeholder="Type your message here." id="">
                 </div>
                 <div class="col s1 message-bar">
-                    <i class="material-icons" style="margin: 5px 0px;color:teal">send</i>
+                    <i class="material-icons" type="submit" style="margin: 5px 0px;color:teal">send</i>
                 </div>
+
+                </form>
             </div>
             
         </div>
