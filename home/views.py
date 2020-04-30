@@ -1,12 +1,18 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from pprint import pprint
 from telethon import TelegramClient
 from django.conf import settings
 from .tasks import *
-from .utils import waiting_for_response
+from .utils import waiting_for_response, send_code_request
 import time 
 import json
 from django.contrib import messages
+# from telethon.sync import TelegramClient
+
+
+client =  TelegramClient('asd',settings.API_ID, settings.API_HASH)
+client.loop.run_until_complete(client.connect())
+loop = asyncio.get_event_loop()
 
 # Create your views here.
 
@@ -27,13 +33,11 @@ def login(request):
             """ Contains logic for sending authentication code for entered number """
             mobile = request.POST.get('mobile')
             context['mobile'] = mobile
-            response = send_code_request.delay(mobile)
-            response = waiting_for_response(response)
             try:
-                response = json.loads(response)
+                response = client.loop.run_until_complete(client.send_code_request(mobile))
                 pprint(response)
                 context['view_code'] = True
-                request.session['phone_code_hash'] = response['phone_code_hash']
+                request.session['phone_code_hash'] = response.phone_code_hash
                 messages.success(request,"Authentication token has been successfully sent on your Telegram account.")
             except Exception as e:
                 print(e)
@@ -44,14 +48,12 @@ def login(request):
             mobile = request.POST.get('mobile')
             auth_code = request.POST.get('auth_code')
             phone_code_hash = request.session['phone_code_hash']
-            
-            response = verify_auth_code.delay(mobile,auth_code, phone_code_hash)
-            response = waiting_for_response(response)
-
+            response = client.loop.run_until_complete(client.sign_in(phone=mobile, code=auth_code,phone_code_hash=phone_code_hash   ))
+            pprint(response)
             try:
-                response = json.loads(response)
-                pprint(response)
                 messages.success(request,"Authentication token has been verified, you will be redirected in a jiffy")
+                request.session['user'] = response.to_json()
+                return redirect('chat')
             except Exception as e:
                 print(e, response)
                 context['mobile'] = mobile
@@ -59,3 +61,17 @@ def login(request):
                 messages.error(request, response.split('(')[0])
 
     return render(request, 'home/login.html', context=context)
+
+
+def chat(request, id=None):
+    """
+    Renders and handles chat page
+    """
+    context = dict()
+
+    if request.POST:
+        pass
+    response = client.loop.run_until_complete(client.get_dialogs())
+    for dialog in response:
+        print(dialog.title, dialog.message.text, str(dialog.date))
+    return render(request, 'home/chat.html', context=context)
