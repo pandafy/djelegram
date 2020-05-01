@@ -2,98 +2,105 @@
 
 {% block pageSpecificCSS %}
 <style>
-    .chat-container{
+    .chat-container {
         min-height: 80vh;
         max-height: 80vh;
         margin-top: 2vh;
     }
 
-    .chat{
+    .chat {
         height: 70vh;
     }
+
     ::-webkit-scrollbar {
-    // Width of vertical scroll bar
-    width: 8px;
-    // Height of horizontal scroll bar
-    height: 10px;
+        // Width of vertical scroll bar
+        width: 8px;
+        // Height of horizontal scroll bar
+        height: 10px;
 
-  }
-  ::-webkit-scrollbar-thumb {
-    border-radius: 8px;
-    background: #c2c9d2;
-  }
-
-  ul{
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-ul li{
-  display:inline-block;
-  clear: both;
-  padding: 15px;
-  border-radius: 30px;
-  margin-bottom: 2px;
-  max-width:80%;
-  /* font-family: Helvetica, Arial, sans-serif; */
-}
-
-    .them{
-    background: #eee;
-    float: left;
     }
 
-    .me{
-    float: right;
-    background:teal;
-    color: #fff;
+    ::-webkit-scrollbar-thumb {
+        border-radius: 8px;
+        background: #c2c9d2;
     }
 
-    .them + .me{
-    border-bottom-right-radius: 5px;
+    ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
     }
 
-    .me + .me{
-    border-top-right-radius: 5px;
-    border-bottom-right-radius: 5px;
+
+
+    ul li {
+        display: inline-block;
+        clear: both;
+        padding: 15px;
+        border-radius: 30px;
+        margin-bottom: 2px;
+        max-width: 80%;
+        /* font-family: Helvetica, Arial, sans-serif; */
+    }
+
+    .them {
+        background: #eee;
+        float: left;
+    }
+
+    .me {
+        float: right;
+        background: teal;
+        color: #fff;
+    }
+
+    .them+.me {
+        border-bottom-right-radius: 5px;
+    }
+
+    .me+.me {
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
     }
 
     .me:last-of-type {
-    border-bottom-
-    right-radius: 30px;.da
+        border-bottom- right-radius: 30px;
+        .da
     }
 
-    .chat{
-        height:fixed;
+    .chat {
+        height: fixed;
         overflow-y: scroll;
         display: flex;
         flex-direction: column-reverse;
     }
 
-    .channel-meta{
-        color : #698192;
+    .channel-meta {
+        color: #698192;
         white-space: nowrap;
         text-overflow: ellipsis;
-        overflow: hidden;   
+        overflow: hidden;
         width: 75%;
         display: inline-block;
     }
-    .chat-title{
+
+    .chat-title {
         white-space: nowrap;
         width: 70%;
         overflow: hidden;
-        display:inline-block;
-        text-overflow: ellipsis;   
+        display: inline-block;
+        text-overflow: ellipsis;
     }
-    .chat-time{
-        
-    }
-    .badge{
-        min-width : 1rem !important;
-    }
-    
 
+    .chat-time {}
+
+    .badge {
+        min-width: 1rem !important;
+    }
+
+    img(height:auto;
+        width:150px;
+    )
 </style>
 {% endblock %}
 
@@ -102,99 +109,112 @@ ul li{
 <div class="container">
     <div class="row chat-container">
         <div class="col s4" style="overflow-y:scroll; height:80vh">
-            
+
             {% if channels %}
-            {% if selected_chat %}  
-                <a href="{%url 'chat' selected_chat.id %}">
-                    <div class="card-panel teal " > 
-                        <span class="chat-title white-text">{{selected_chat.name}}</span>
-                        <span class="right chat-time white-text">{{ selected_chat.date }}</span>
+            {% if selected_chat %}
+            <a href="{%url 'chat' selected_chat.id %}">
+                <div class="card-panel teal ">
+                    <span class="chat-title white-text">{{selected_chat.name}}</span>
+                    <span class="right chat-time white-text">{{ selected_chat.date }}</span>
                     <div class="white-text">
                         <span class="channel-meta white-text">
-                        {% if selected_chat.message %}
+                            {% if selected_chat.message %}
                             {% if request.session.user_id|slugify == selected_chat.sender %}
-                                You
+                            You
                             {% else %}
-                                {{ entities|get_item:selected_chat.sender }}
+                            {{ entities|get_item:selected_chat.sender }}
                             {% endif %}
-                            
+
                             : {{selected_chat.message}}
-                        {% endif %}
+                            {% endif %}
                         </span>
-                         {% if selected_chat.unread_count %}
-                        <span class="white badge circle teal-text right"  data-badge-caption="">{{selected_chat.unread_count}}</span>
-                        {% endif %} 
+                        {% if selected_chat.unread_count %}
+                        <span class="white badge circle teal-text right"
+                            data-badge-caption="">{{selected_chat.unread_count}}</span>
+                        {% endif %}
                     </div>
-                    </div>
-                </a>
+                </div>
+            </a>
             {% endif %}
 
             {% for channel in channels %}
-                {% if channel.id == selected_chat.id %}
+            {% if channel.id == selected_chat.id %}
 
-                {% else %}
-                <a href="{%url 'chat' channel.id %}">
-                    <div class="card-panel"> 
+            {% else %}
+            <a href="{%url 'chat' channel.id %}">
+                <div class="card-panel">
                     <div>
                         <span class="chat-title">{{channel.name}}</span>
                         <span class="right chat-time">{{channel.date}}</span>
                     </div>
                     <div class="">
                         <span class="channel-meta">
-                        {% if channel.message %}
+                            {% if channel.message %}
                             {% if request.session.user_id|slugify == channel.sender %}
-                                You
+                            You
                             {% else %}
-                                {{ entities|get_item:channel.sender }}
+                            {{ entities|get_item:channel.sender }}
                             {% endif %}
-                            
+
                             : {{channel.message}}
-                        {% endif %}
+                            {% endif %}
                         </span>
                         {% if channel.unread_count %}
-                        <span class="teal badge circle white-text right"  data-badge-caption="">{{channel.unread_count}}</span>
+                        <span class="teal badge circle white-text right"
+                            data-badge-caption="">{{channel.unread_count}}</span>
                         {% endif %}
                     </div>
-                    </div>
-                </a>
-                {% endif %}
+                </div>
+            </a>
+            {% endif %}
             {% endfor %}
             {% endif %}
         </div>
         <div class="col s8">
             <div class="chat card-panel">
                 <ul>
-                
-                    {% if messages %}
-                    
-                        {% for message in messages reversed%}
-                            <li 
-                                {% if request.session.user_id == message.from_id  %}
-                                    class="me"
-                                {% else %}
-                                    class="them"
-                                {% endif %}
-                                >{{message.text}}{{ message.from_user }}</li>
-                        {% endfor %}
+
+                    {% if chat_messages%}
+
+                    {% for message in chat_messages reversed%}
+                    <li {% if request.session.user_id == message.from_id  %} class="me" {% else %} class="them"
+                        {% endif %}>
+                        {% if message.text %}
+                        {{message.text}}
+
+                        {% elif message.photo %}
+                        {% with message.photo.id|slugify as photo_id %}
+                        {% comment %} {{ medias}} {{message.photo.id|slugify}} {% endcomment %}
+                        <img class="chat-image" style="height:auto;width:150px; border-radius:inherit"
+                            src="/{{ medias|get_item:photo_id }}" alt={{message.photo}}>
+                        {% endwith %}
+
+                        {% else %}
+                        <span style="background-color:#b2d8d8" class="teal-text">This type of messages can't be show on
+                            Djelegram</span>
+                        {% endif %}
+                    </li>
+
+                    {% endfor %}
                     {% endif %}
 
-                   </ul>
+                </ul>
             </div>
             <div class="row">
                 <form method="POST" action={% url 'send-message' %}>
-                {% csrf_token %}
-                <input type="hidden" value="{{request.session.recipient}}" name="recipient" type="number">
-                <div class=" col s11 message-bar">
-                
-                    <input type="text" name="text" placeholder="Type your message here." id="">
-                </div>
-                <div class="col s1 message-bar">
-                    <i class="material-icons" type="submit" style="margin: 5px 0px;color:teal">send</i>
-                </div>
+                    {% csrf_token %}
+                    <input type="hidden" value="{{request.session.recipient}}" name="recipient" type="number">
+                    <div class=" col s11 message-bar">
+
+                        <input type="text" name="text" placeholder="Type your message here." id="">
+                    </div>
+                    <div class="col s1 message-bar">
+                        <i class="material-icons" type="submit" style="margin: 5px 0px;color:teal">send</i>
+                    </div>
 
                 </form>
             </div>
-            
+
         </div>
     </div>
 </div>
