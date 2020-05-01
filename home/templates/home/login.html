@@ -1,27 +1,27 @@
 {% extends 'home/index.html' %}
 
+
+{% block pageSpecificCSS %}
+<style>
+#toast-container {
+  right: auto !important;
+  left:30%;
+  top:5%;
+}
+</style>
+{% endblock pageSpecificCSS %}
+
 {% block body %}
 <div class="container">
-    <div class="section">
+    <div class="section valign-wrapper " style="height:58vh">
     {% comment %} We can opt for toast here {% endcomment %}
-        {% if messages %}
-            <ul class="messages alert">
-                {% for message in messages %}
-                    <div class="alert {{ message.tags }} alert-dismissible" role="alert">
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                        </button>
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </ul>
-        {% endif %}
+        
 
-        <div class="row center-align">
-            <form class="col s8 offset-s4" method="POST" action={% url 'login' %}>
+        <div class="row center-align card-panel" style="margin-left:auto;margin-right:auto;">
+            <form class="col s12" method="POST" action={% url 'login' %}>
                 {% csrf_token %}
                 <div class="row">
-                <div class="input-field col s6">
+                <div class="input-field col s12">
                   <i class="material-icons prefix">phone</i>
                   <input id="icon_telephone" name="mobile" type="tel" class="validate" placeholder="+910000000000"
                     {% if mobile %}
@@ -37,7 +37,7 @@
 
                 {% if view_code %}
                 <div class="row">
-                <div class="input-field col s6">
+                <div class="input-field col s12">
                   <i class="material-icons prefix">lock</i>
                   <input id="icon_auth_code" name="auth_code" type="text" class="validate" placeholder="Enter 5 digit authentication code">
                   <label for="icon_auth_code">Authentication Code</label>
@@ -46,7 +46,7 @@
                 {% endif %}
                 
                 <div class="row">
-                    <div class="input-field col s6">
+                    <div class="input-field col s12">
                        <input type="submit" name="submit" class="waves-effect waves-light btn"
                             {% if view_code %}
                                 value="Verify Authentication Code"
@@ -63,3 +63,14 @@
     </div>
   </div>
 {% endblock body %}
+
+{% block pageSpecificJS %}
+<script>
+{% if messages %}
+    {% for message in messages %}
+    M.toast({html: '{{ message }}', classes:'center-align', outDuration:1000})
+    {% endfor %}
+{% endif %}
+
+</script>
+{% endblock pageSpecificJS %}

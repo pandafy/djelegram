@@ -172,9 +172,21 @@
         </div>
         <div class="col s8">
             <div class="chat card-panel">
-                <ul>
+                <div id="loader"class="preloader-wrapper small active" style="position: fixed;top: 14vh;left: 60%; display:none">
+                    <div class="spinner-layer spinner-red-only">
+                    <div class="circle-clipper left">
+                        <div class="circle"></div>
+                    </div><div class="gap-patch">
+                        <div class="circle"></div>
+                    </div><div class="circle-clipper right">
+                        <div class="circle"></div>
+                    </div>
+                    </div>
+                </div>
+                {% if chat_messages%}
+                <ul id="chat-list">
 
-                    {% if chat_messages%}
+                    
 
                     {% for message in chat_messages reversed%}
                     <li {% if request.session.user_id == message.from_id  %} class="me" {% else %} class="them"
@@ -185,7 +197,7 @@
                         {% elif message.photo %}
                         {% with message.photo.id|slugify as photo_id %}
                         {% comment %} {{ medias}} {{message.photo.id|slugify}} {% endcomment %}
-                        <img class="chat-image" style="height:auto;width:150px; border-radius:inherit"
+                        <img class="chat-image" style="height:auto;width:300px; border-radius:inherit"
                             src="/{{ medias|get_item:photo_id }}" alt={{message.photo}}>
                         {% endwith %}
 
@@ -196,20 +208,25 @@
                     </li>
 
                     {% endfor %}
+                    </ul>
+                    {% else %}
+                    <div class="valign-wrapper center-align" style="height:inherit">
+                        <h6 class="center-align">Select a coversation from right channel to start chatting. <h5>
+                    </div>
                     {% endif %}
 
-                </ul>
+                
             </div>
             <div class="row">
-                <form method="POST" action={% url 'send-message' %}>
+                <form method="POST" action={% url 'send-message' %} id="send-msg-form">
                     {% csrf_token %}
                     <input type="hidden" value="{{request.session.recipient}}" name="recipient" type="number">
                     <div class=" col s11 message-bar">
 
-                        <input type="text" name="text" placeholder="Type your message here." id="">
+                        <input type="text" name="text" placeholder="Type your message here." id="" {% if not request.session.recipient %}disabled{% endif %}>
                     </div>
                     <div class="col s1 message-bar">
-                        <i class="material-icons" type="submit" style="margin: 5px 0px;color:teal">send</i>
+                        <i class="material-icons waves-light waves-effect" type="submit" id="send-btn"   style="margin: 5px 0px;{% if not request.session.recipient %}color:grey{% endif %}color:teal">send</i>
                     </div>
 
                 </form>
@@ -220,3 +237,55 @@
 </div>
 
 {%  endblock body %}
+
+{% block pageSpecificJS %}
+<script>
+$('#send-btn').click(function(){
+    $('#send-msg-form').submit()
+})
+{% if messages %}
+    {% for message in messages %}
+    M.toast({html: '{{ message }}', classes:'center-align', outDuration:500})
+    {% endfor %}
+{% endif %}
+
+$('.chat').scroll(function(){
+    if($(this).scrollTop() === 0){
+        console.log("reached top")
+        $('#loader').show()
+        $.ajax({
+            url: "{% url 'get-more' %}",
+            cache: false,
+            success: function(response){
+                messages=response['messages']
+                for(i=0;i<messages.length;++i){
+                    console.log("looping")
+                    if(messages[i]['from_id'] == {{request.session.user_id }})
+                        klass = "me"
+                    else
+                        klas = "them"
+                    if(messages[i]['text']){
+                        html = `<li class="${klass}">${messages[i]['text']}</li>`
+                    }
+                    else if(messages[i]['photo']){
+                        html = `<li class="${klass}"><img class="chat-image" style="height:auto;width:300px; border-radius:inherit"
+                            src="/${messages[i]['photo']}" ></li>`
+                    }
+                    else{
+                        html = `<li class="${klass}"><span style="background-color:#b2d8d8" class="teal-text">This type of messages can't be show on
+                            Djelegram</span> </li>`
+                    }
+                    $('#chat-list').prepend(html)
+                }
+                $('#loader').hide()
+            },
+            error:function(response){
+                alert("your request failed")
+            }
+        });
+    }
+})
+
+
+</script>
+{% endblock pageSpecificJS %}

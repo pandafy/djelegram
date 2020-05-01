@@ -1,18 +1,13 @@
 from celery import shared_task
-from  telethon import TelegramClient
-from django.conf import settings    
-import asyncio
-from . import utils
+from . import client
 
 
 @shared_task
-def send_code_request(mobile):
-   return asyncio.run(utils.send_code_request(mobile))
-   
-@shared_task
-def verify_auth_code(mobile, code, phone_code_hash):
-    return asyncio.run(utils.sign_in(mobile, code, phone_code_hash))
-
-@shared_task
-def get_all_chats():
-    return asyncio.run(utils.get_dialogs())
+def mark_as_read(no_of_unreads, entity):
+    messages = client.loop.run_until_complete(
+        client.get_messages(limit=no_of_unreads, entity=entity))
+    for m in messages:
+        try:
+            client.loop.run_until_complete(client.send_read_acknowledge(m))
+        except:
+            pass
