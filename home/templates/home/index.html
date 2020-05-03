@@ -40,10 +40,11 @@
   <body>
     <nav class="white" role="navigation">
       <div class="nav-wrapper container">
-       <div class="brand-logo valign-wrapper " style="display:inline-flex;"> 
-        <span style="margin-top:8px" ><img height="50px" src="{% static 'home/images/logo.png' %}"></span>
-        <span>&nbsp; Djelegram</span>
+       <a class="brand-logo" href="{% url 'home' %}"> <div class=" valign-wrapper " >
+          <img height="50px" src="{% static 'home/images/logo.png' %}" > Djelegram
+          
       </div>
+      </a>
 
         <ul class="right hide-on-med-and-down">
           {% if request.path == '/' %}

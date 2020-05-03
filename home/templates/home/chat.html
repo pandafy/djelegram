@@ -263,7 +263,7 @@ $('.chat').scroll(function(){
                     if(messages[i]['from_id'] == {{request.session.user_id }})
                         klass = "me"
                     else
-                        klas = "them"
+                        klass = "them"
                     if(messages[i]['text']){
                         html = `<li class="${klass}">${messages[i]['text']}</li>`
                     }

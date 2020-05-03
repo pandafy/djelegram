@@ -14,7 +14,6 @@ RUN pip install -r requirements.txt
 RUN mkdir /app
 WORKDIR /app
 COPY ./  /app
-RUN apt install curl -y 
 RUN adduser --disabled-login user
 USER user
 

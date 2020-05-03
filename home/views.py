@@ -8,7 +8,7 @@ from datetime import datetime
 from home.custom_filters import get_item
 from . import client, init
 # from telethon.sync import TelegramClient
-
+import asyncio
 
 # loop = asyncio.get_event_loop()
 entities = dict()
@@ -216,10 +216,7 @@ def logout(request):
             break
         except:
             pass
-    # loop = asyncio.get_event_loop()
-    # loop = asyncio.new_event_loop()
-    # client._loop = loop
-    client = client.loop.run_until_complete(init())
+    init()
     print(client.loop.run_until_complete(client.connect()))
 
     return redirect('login')
